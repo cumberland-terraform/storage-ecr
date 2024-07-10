@@ -1,4 +1,5 @@
 pipeline {
+	
 	agent { 
 		label 'jenkins-slave-java' 
 	}
@@ -10,16 +11,30 @@ pipeline {
 	}
 
 	stages {
+			stage('Credentials') {
+				steps {
+					withCredentials([
+						file(credentialsId: 'mdtjenkinsbgit', variable: 'bitbucketsshkey')
+					]) {
+						sh '''
+							mkdir ~/.ssh
+							touch ~/.ssh/id_rsa
+							cat $(echo $bitbucketsshkey) > ~/.ssh/id_rsa
+							chmod 400 ~/.ssh/id_rsa
+							ssh-keyscan -t rsa source.mdthink.maryland.gov >> ~/.ssh/known_hosts
+						'''
+					}
+				}
+	   		}
 
-		stage ('cleanWorkSpace') {
-			steps { 
-				cleanWs() 
-			}
-		}
-		
+		/*
+		Check for Terraform and TFLint before install
+		to reduce runtime. Print versions of each for
+		documentation and pipeline debugging
+		*/
 		stage ('Dependencies') {
 			steps {
-				echo '----- Confirming Dependencies'
+				echo '----- Confirming Terraform is Preasent'
 				sh '''
 				    if ! command -V terraform &> /dev/null
 					then
@@ -30,7 +45,10 @@ pipeline {
 					else
 					    terraform --version
 					fi
-					if ! command -V tflint &> /dev/null
+				'''
+				echo '----- Confirming TFLint is Preasent'
+				sh '''
+				    if ! command -V tflint &> /dev/null
 					then
 					    curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 						tflint --version
@@ -38,18 +56,52 @@ pipeline {
 					    tflint --version
 					fi
 				'''
+                echo '------ Initializing TFLint'
+                sh '''
+                    tflint --init
+                '''
+				echo '----- Confirming TFSec is Preasent'
+				sh '''
+				    if ! command -V tfsec &> /dev/null
+					then
+					    curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+						tfsec --version
+					else
+					    tfsec --version
+					fi
+				'''
 			}
 		}
-
+		/*
+		Uses recursive feature to lint subdirectories
+		Uses  force tag to return 0 exit code even when
+		issues are found. ONLY DURING INITIAL DEV
+		*/
 		stage ('Lint') {
 			steps {
 				echo '----- Linting'
+				sh '''
+					tflint --recursive --force
+				'''
+			}
+		}
+
+		stage ('Sec Scanning') {
+		    steps {
+				echo '----- Security and Misconfiguration scanning'
+				sh '''
+				    tfsec . --format json --no-colour --soft-fail
+				'''
 			}
 		}
 
 		stage ('Test') {
 			steps {
 				echo '---- Testing'
+				sh '''
+					terraform init -no-color
+					terraform test -json
+				'''
 			}
 		}
 	}
