@@ -24,13 +24,18 @@ locals {
     ## RDS DEFAULTS
     #   These are platform defaults and should only be changed when the 
     #       platform itself changes.
-    platform_defaults                   = {
+    platform_defaults               = {
+        scan_on_push                = true
     }
     
     ## CALCULATED PROPERTIES
     # Variables that store local calculations
-    tags                                = merge({
-
+    tags                            = merge({
+        Name                        = local.name
+        Builder                     = var.ecr.tags.builder
+        Owner                       = var.ecr.tags.owner
+        Purpose                     = var.ecr.tags.purpose
+        PrimaryContact              = var.ecr.tags.primary_contact
     }, module.platform.tags)
 
 

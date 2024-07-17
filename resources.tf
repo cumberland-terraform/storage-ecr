@@ -3,7 +3,7 @@ resource "aws_ecr_repository" "this" {
     image_tag_mutability    = var.repository.mutability
 
     image_scanning_configuration {
-        scan_on_push        = true
+        scan_on_push        = local.platform_defaults.scan_on_push
     }
 
     encryption_configuration {
