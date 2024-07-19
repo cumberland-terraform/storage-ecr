@@ -1,5 +1,4 @@
 pipeline {
-	
 	agent { 
 		label 'jenkins-slave-java' 
 	}
@@ -56,11 +55,7 @@ pipeline {
 					    tflint --version
 					fi
 				'''
-                echo '------ Initializing TFLint'
-                sh '''
-                    tflint --init
-                '''
-				echo '----- Confirming TFSec is Preasent'
+				echo '----- Confirming TFSec is Present'
 				sh '''
 				    if ! command -V tfsec &> /dev/null
 					then
@@ -79,18 +74,27 @@ pipeline {
 		*/
 		stage ('Lint') {
 			steps {
-				echo '----- Linting'
 				sh '''
-					tflint --recursive --force
+					tflint \
+						--init
+					tflint \
+						--config=./.tflint.hcl \
+							> lint.json
+					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/ecr/lint/lint_$(date +%s).json
 				'''
 			}
 		}
 
 		stage ('Sec Scanning') {
 		    steps {
-				echo '----- Security and Misconfiguration scanning'
 				sh '''
-				    tfsec . --format json --no-colour --soft-fail
+				    tfsec . \
+						--format json \
+						--no-colour \
+						--soft-fail \
+						--tfvars-file ./tests/idengr.tfvars
+							> sec.json
+					aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/ecr/sec/sec_$(date +%s).json
 				'''
 			}
 		}
@@ -99,8 +103,12 @@ pipeline {
 			steps {
 				echo '---- Testing'
 				sh '''
-					terraform init -no-color
-					terraform test -json
+					terraform init \
+						-no-color
+					terraform test \
+						-json > test.json || true
+					aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/ecr/test/test_$(date +%s).json
+
 				'''
 			}
 		}
