@@ -1,4 +1,5 @@
 variable "platform" {
+<<<<<<< HEAD
   description                           = "Platform metadata configuration object. See [Platform Module] (https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-platform/browse) for detailed information about the permitted values for each field."
   type                                  = object({
     aws_region                          = string 
@@ -11,12 +12,36 @@ variable "platform" {
     domain                              = string
     availability_zones                  = list(string)
     pca                                 = string
+=======
+  description                   = "Platform metadata configuration object. See [Platform Module] (https://source.mdthink.maryland.gov/projects/ET/repos/mdt-eter-platform/browse) for detailed information about the permitted values for each field."
+  type                          = object({
+    aws_region                  = string 
+    account                     = string
+    acct_env                    = string
+    agency                      = string
+    program                     = string
+    app                         = string
+    app_env                     = string
+    pca                         = string
+>>>>>>> 7e7d3c245aa9f56dac70d033a22bc3ff8b0d5420
   })
 }
 
-variable "rs" {
-  description   = "todo"
-  type         = object({
-
+variable "ecr" {
+  description                   = "ECR configuration object. See [README]() for detailed infromation about the permitted values for each field."
+  type                          = object({
+    suffix                      = string
+    tags                          = object({
+      builder                     = string
+      primary_contact             = string
+      owner                       = string
+      purpose                     = string
+    })
+    additional_policies         = optional(list(string), [])
+    mutability                  = optional(string, "IMMUTABLE")
+    kms_key                     = optional(object({
+      id                        = string
+      arn                       = string
+    }))
   })
 }
