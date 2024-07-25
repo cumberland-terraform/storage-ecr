@@ -84,6 +84,7 @@ pipeline {
 						-f json \
 						--config ./.tflint.hcl \
 						> lint.json
+					cat lint.json
 					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/${S3_DIR}/lint/${BUILD_NUMBER}_lint_$(date +%s).json
 				'''
 			}
