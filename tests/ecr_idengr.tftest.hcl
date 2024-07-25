@@ -18,9 +18,7 @@ variables {
         app                                 = "TERRAFORM ENTERPRISE"
         program                             = "MDTHINK SHARED PLATFORM"
         app_env                             = "NON PRODUCTION"
-        domain                              = "ENGINEERING"
         pca                                 = "FE110"
-        owner                               = "MDT DevOps"
     }
     ecr                                     = {
         suffix                              = "ETER"
