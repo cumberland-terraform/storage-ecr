@@ -8,6 +8,9 @@ platform                                = {
     app_env                             = "NON PRODUCTION"
     pca                                 = "FE110"
 }
+kms                                     = {
+    alias_suffix                        = "DEVOPS"
+}
 ecr                                     = {
     suffix                              = "ETER"
     tags                                = {
