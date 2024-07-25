@@ -22,7 +22,7 @@ variable "ecr" {
       owner                       = string
       purpose                     = string
     })
-    policy_principals           = optional(list(string), [])
+    policy_principals           = optional(list(string), null)
     additional_policies         = optional(list(string), [])
     mutability                  = optional(string, "IMMUTABLE")
     kms_key                     = optional(object({
