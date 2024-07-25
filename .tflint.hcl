@@ -3,14 +3,13 @@ tflint {
 }
 
 config {
-  format            = "json"
-  force             = true
-  varfile           = [ "tests/idengr.tfvars" ]
+//    format          = "json" not functional due to defect within tflint. TODO uncomment once fixed
+    force           = true
+    varfile         = [ "tests/idengr.tfvars" ]
 }
 
-
 plugin "aws" {
-  enabled           = true
-  version           = "0.32.0"
-  source            = "github.com/terraform-linters/tflint-ruleset-aws"
+    enabled         = true
+    version         = "0.32.0"
+    source          = "github.com/terraform-linters/tflint-ruleset-aws"
 }
