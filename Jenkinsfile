@@ -7,6 +7,7 @@ pipeline {
 		TF_VER = '1.8.5'
 		OS_ARCH = 'amd64' 
 		EMAIL_LIST = 'grant.moore@maryland.gov,aaron.ramirez@maryland.gov'
+		S3_DIR = 'ecr'
 	}
 
 	stages {
@@ -67,6 +68,7 @@ pipeline {
 				'''
 			}
 		}
+
 		/*
 		Uses recursive feature to lint subdirectories
 		Uses  force tag to return 0 exit code even when
@@ -74,19 +76,23 @@ pipeline {
 		*/
 		stage ('Lint') {
 			steps {
+				echo '----- Linting'
 				sh '''
 					tflint \
 						--init
 					tflint \
-						--config=./.tflint.hcl \
-							> lint.json
-					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/ecr/lint/lint_$(date +%s).json
+						-f json \
+						--config ./.tflint.hcl 
+						> lint.json
+					cat lint.json
+					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/${S3_DIR}/lint/${BUILD_NUMBER}_lint_$(date +%s).json
 				'''
 			}
 		}
 
 		stage ('Sec Scanning') {
 		    steps {
+				echo '----- Security and Misconfiguration scanning'
 				sh '''
 				    tfsec . \
 						--format json \
@@ -94,7 +100,7 @@ pipeline {
 						--soft-fail \
 						--tfvars-file ./tests/idengr.tfvars
 							> sec.json
-					aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/ecr/sec/sec_$(date +%s).json
+					aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/${S3_DIR}/sec/${BUILD_NUMBER}_sec_$(date +%s).json
 				'''
 			}
 		}
@@ -107,8 +113,7 @@ pipeline {
 						-no-color
 					terraform test \
 						-json > test.json || true
-					aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/ecr/test/test_$(date +%s).json
-
+					aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/${S3_DIR}/test/${BUILD_NUMBER}_test_$(date +%s).json
 				'''
 			}
 		}

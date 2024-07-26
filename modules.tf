@@ -6,7 +6,7 @@ module "platform" {
 
 module "kms" {
   count                 = local.conditions.provision_kms_key ? 1 : 0
-  source                = "git::ssh://git@source.mdthink.maryland.gov:22/et/mdt-eter-core-security-kms.git"
+  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-core-security-kms.git"
 
   kms                   = {
       alias_suffix      = "ECR-${var.ecr.suffix}"
