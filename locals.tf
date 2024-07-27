@@ -18,7 +18,7 @@ locals {
 
     kms_key_arn                     = local.conditions.provision_kms_key ? (
                                         module.kms[0].key.arn
-                                    ) : var.ec2.kms_key.arn
+                                    ) : var.ecr.kms_key.arn
 
     name                            = upper("${module.platform.prefixes.storage.ecr.repository}-${var.ecr.suffix}")
     ## RDS DEFAULTS
