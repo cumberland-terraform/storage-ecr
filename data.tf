@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "unmerged" {
                                 ]
         
         principals {
-            type                  =  "AWS"
+            type                  = "AWS"
             identifiers           = local.unmerged_policy_principals
         }
     }

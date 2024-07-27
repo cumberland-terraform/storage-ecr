@@ -13,14 +13,14 @@ variable "platform" {
 }
 
 variable "ecr" {
-  description                   = "ECR configuration object. See [README]() for detailed infromation about the permitted values for each field."
+  description                   = "ECR configuration object. See [README](https://source.mdthink.maryland.gov/projects/ET/repos/mdt-eter-core-storage-ecr/browse) for detailed information about the permitted values for each field."
   type                          = object({
     suffix                      = string
-    tags                          = object({
-      builder                     = string
-      primary_contact             = string
-      owner                       = string
-      purpose                     = string
+    tags                        = object({
+      builder                   = string
+      primary_contact           = string
+      owner                     = string
+      purpose                   = string
     })
     policy_principals           = optional(list(string), null)
     additional_policies         = optional(list(string), [])

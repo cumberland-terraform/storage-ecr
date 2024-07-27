@@ -2,16 +2,35 @@
 ## AWS Core Storage Elastic Container Registry
 ### Overview
 
-TODO
+This is the core module for **MDTHINK Platform** ECR repositories. This module will provision an ECR and a resource based policy. By default, the policy will allow IAM principals in the target account access to read from the repository. To override the default access list, see **Parameters** below.
 
 ### Usage
 
 The bare minimum deployment can be achieved with the following configuration,
 
+**providers.tf**
+
+```hcl
+provider "aws" {
+	alias 					= "tenant"
+	region					= "<region>"
+
+	assume_role {
+		role_arn 			= "arn:aws:iam::<tenant-account>:role/IMR-MDT-TERA-EC2"
+	}
+}
 ```
+
+**modules.tf**
+
+```hcl
 module "ecr" {
-	source          		        = "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-storage-ecr.git"
+	source          		        = "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-storage-ecr.git?ref=v1.0.0"
 	
+        providers                               = {
+                aws                             = aws.tenant
+        }
+
 	platform				= {
                 aws_region                      = "<region-name>"
                 account                         = "<account-name>"
@@ -24,8 +43,14 @@ module "ecr" {
                 availability_zones              = [ "<availability-zones>" ]
 	}
 
-	redshift				= {
-        # TODO
+	ecr				        = {
+                suffix                          = "<suffix>"
+                tags                            ={
+                        builder                 = "<builder>"
+                        primary_contact         = "<primary-contact>"
+                        owner                   = "<owner>"
+                        purpose                 = "<purpose>"
+                }
 	}
 }
 ```
@@ -34,7 +59,20 @@ module "ecr" {
 
 ### Parameters
 
-TODO
+The `ecr` object represents the configuration for a new deployment. Only two fields are absolutely required: `suffix` and `tags`. See previous section for example usage. The following bulleted list shows the hierarchy of allowed values for the `ecr` object fields and their purpose,
+
+- `suffix`: (*Required*): String that is appended to the platform naming prefix.
+- `tags`: (*Required*):
+        - `builder`: (*Required*) Person or process responsible for provisioning.
+	- `primary_contact`: (*Required*) Contact information for the owner of the repository.
+	- `owner`: (*Required*) Name of the owner.
+	- `purpose`: (*Required*) Description of the repository.
+- `mutability`: (*Optional*) Property for configuring the mutability of the repository. Defaults to `IMMUTABLE`, meaning tags cannot be overriden on push, i.e. once a tag is defined, it is etched into the annals of eternity.
+- `policy_principals`: (*Optional*) A list of IAM policy principals that will be given added to the access list of the resource policy. If no `policy_principals` are provided, access will be provided to *all* IAM principals in the target account.
+- `additional_policies`: (*Optional*): A list of stringified IAM policy JSONs. These policies will be appended to the resource policy, in addition to the default policy that is provisioned.
+- `kms_key`: (*Optional*) KMS key object used to encrypt block devices. If no KMS key is provided, a new KMS key will be provisioned and access will be provided to the instance profile IAM role.
+	- `id`: Physical ID of the KMS key.
+	- `arn`: AWS ARN of the KMS key.
 
 ## Contributing
 
