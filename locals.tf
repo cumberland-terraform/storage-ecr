@@ -4,7 +4,7 @@ locals {
     #       to different deployment configurations.
     conditions                      = {
         merge_policies              = var.ecr.additional_policies != null
-        provision_key               = var.ecr.kms_key == null
+        provision_kms_key           = var.ecr.kms_key == null
         root_principal              = var.ecr.policy_principals == null
     }
 
