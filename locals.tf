@@ -20,7 +20,10 @@ locals {
                                         module.kms[0].key.arn
                                     ) : var.ecr.kms_key.arn
 
-    name                            = upper("${module.platform.prefixes.storage.ecr.repository}-${var.ecr.suffix}")
+    name                            = lower(join("-",[
+                                        module.platform.prefixes.storage.ecr.repository,
+                                        var.ecr.suffix
+                                    ]))
     ## RDS DEFAULTS
     #   These are platform defaults and should only be changed when the 
     #       platform itself changes.
