@@ -9,8 +9,8 @@ locals {
     }
 
     policy                          = local.conditions.merge_policies ? (
-                                        data.aws_iam_policy_document.merged[0]
-                                    ) : data.aws_iam_policy_document.unmerged
+                                        data.aws_iam_policy_document.merged[0].json
+                                    ) : data.aws_iam_policy_document.unmerged.json
                                     
     unmerged_policy_principals      = local.conditions.root_principal ? [
                                         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"

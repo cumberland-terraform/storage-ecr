@@ -13,19 +13,19 @@ data "aws_iam_policy_document" "unmerged" {
   #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
 
     statement {
-        sid                     = "EnableAccess"
-        effect                  = "Allow"
-        actions                 = [
-                                    "ecr:BatchGetImage",
-                                    "ecr:BatchCheckLayerAvailability",
-                                    "ecr:CompleteLayerUpload",
-                                    "ecr:Get*",
-                                    "ecr:Describe*",
-                                    "ecr:InitiateLayerUpload",
-                                    "ecr:List*",
-                                    "ecr:PutImage",
-                                    "ecr:UploadLayerPart"
-                                ]
+        sid                         = "EnableAccess"
+        effect                      = "Allow"
+        actions                     = [
+                                        "ecr:BatchGetImage",
+                                        "ecr:BatchCheckLayerAvailability",
+                                        "ecr:CompleteLayerUpload",
+                                        "ecr:Get*",
+                                        "ecr:Describe*",
+                                        "ecr:InitiateLayerUpload",
+                                        "ecr:List*",
+                                        "ecr:PutImage",
+                                        "ecr:UploadLayerPart"
+                                    ]
         
         principals {
             type                  = "AWS"
