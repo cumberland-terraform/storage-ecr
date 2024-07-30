@@ -3,9 +3,9 @@ tflint {
 }
 
 config {
-//    format          = "json" not functional due to defect within tflint. TODO uncomment once fixed
+    format          = "json"
     force           = true
-    varfile         = [ "tests/idengr.tfvars" ]
+    varfile         = [ ".ci/tests/idengr.tfvars" ]
 }
 
 plugin "aws" {
