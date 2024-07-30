@@ -15,23 +15,27 @@ variables {
         account                             = "ID ENGINEERING"
         acct_env                            = "NON-PRODUCTION 1"
         agency                              = "MARYLAND TOTAL HUMAN-SERVICES INTEGRATED NETWORK"
-        app                                 = "TERRAFORM ENTERPRISE"
         program                             = "MDTHINK SHARED PLATFORM"
+        app                                 = "KUBERNETES WORKER NODE"
         app_env                             = "NON PRODUCTION"
+        domain                              = "ENGINEERING"
         pca                                 = "FE110"
-    }
-    kms                                     = {
-        alias_suffix                        = "DEVOPS"
+        owner                               = "AWS DevOps Team"
+        availability_zones                  = [ "A01", "C01" ]
     }
     
     ecr                                     = {
-        suffix                              = "ETER"
+        suffix                              = "ENGR"
         tags                                = {
             purpose                         = "Mock Purpose"
             builder                         = "Mock Builder"
             primary_contact                 = "Mock Primary Contact"
             owner                           = "Mock Owner"
         }
+    }
+
+    kms                                     = {
+        alias_suffix                        = "DEVOPS"
     }
 }
 
