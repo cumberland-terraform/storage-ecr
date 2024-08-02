@@ -7,12 +7,14 @@ pipeline {
 		TF_VER = '1.8.5'
 		OS_ARCH = 'amd64' 
 		EMAIL_LIST = 'grant.moore@maryland.gov,aaron.ramirez@maryland.gov'
-		S3_DIR = 'ecr'
+		MODULE_NAME = 'ecr'
+		TF_LOG = 'WARN'
 	}
 
 	stages {
 			stage('Credentials') {
 				steps {
+					echo '----- Setting BitBucket Auth'
 					withCredentials([
 						file(credentialsId: 'mdtjenkinsbgit', variable: 'bitbucketsshkey')
 					]) {
@@ -34,37 +36,30 @@ pipeline {
 		*/
 		stage ('Dependencies') {
 			steps {
-				echo '----- Confirming Terraform is Preasent'
+				echo '----- Installing Terraform'
 				sh '''
-				    if ! command -V terraform &> /dev/null
-					then
-					    wget -q https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_${OS_ARCH}.zip
-        			    unzip -o terraform_${TF_VER}_linux_${OS_ARCH}.zip
-        			    sudo cp -rf terraform /usr/local/bin/
-        			    terraform --version
-					else
-					    terraform --version
-					fi
+					wget -q https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_${OS_ARCH}.zip
+        			unzip -o terraform_${TF_VER}_linux_${OS_ARCH}.zip
+        			sudo cp -rf terraform /usr/local/bin/
+        			terraform --version
 				'''
-				echo '----- Confirming TFLint is Preasent'
+				echo '----- Installing TFLint'
 				sh '''
-				    if ! command -V tflint &> /dev/null
-					then
-					    curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-						tflint --version
-					else
-					    tflint --version
-					fi
+					curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+					tflint --version
 				'''
-				echo '----- Confirming TFSec is Present'
+				echo '----- Installing TFSec'
 				sh '''
-				    if ! command -V tfsec &> /dev/null
-					then
-					    curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
-						tfsec --version
-					else
-					    tfsec --version
-					fi
+					curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+					tfsec --version
+				'''
+				echo '----- Installing TFDocs'
+				sh '''
+					curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.18.0/terraform-docs-v0.18.0-$(uname)-amd64.tar.gz
+					tar -xzf terraform-docs.tar.gz
+					chmod +x terraform-docs
+					sudo mv terraform-docs /usr/local/bin/terraform-docs
+					terraform-docs --version
 				'''
 			}
 		}
@@ -79,13 +74,13 @@ pipeline {
 				echo '----- Linting'
 				sh '''
 					tflint \
-						--init
+						--init \
+						--config .ci/.tflint.hcl 
 					tflint \
 						-f json \
-						--config ./.tflint.hcl 
+						--config .ci/.tflint.hcl \
 						> lint.json
-					cat lint.json
-					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/${S3_DIR}/lint/${BUILD_NUMBER}_lint_$(date +%s).json
+					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/lint/${BUILD_NUMBER}_lint_$(date +%s).json
 				'''
 			}
 		}
@@ -98,9 +93,9 @@ pipeline {
 						--format json \
 						--no-colour \
 						--soft-fail \
-						--tfvars-file ./tests/idengr.tfvars
+						--tfvars-file ./.ci/tests/idengr.tfvars
 							> sec.json
-					aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/${S3_DIR}/sec/${BUILD_NUMBER}_sec_$(date +%s).json
+					aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/sec/${BUILD_NUMBER}_sec_$(date +%s).json
 				'''
 			}
 		}
@@ -112,8 +107,26 @@ pipeline {
 					terraform init \
 						-no-color
 					terraform test \
+						-test-directory ./.ci/tests \
 						-json > test.json || true
-					aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/${S3_DIR}/test/${BUILD_NUMBER}_test_$(date +%s).json
+					aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/test/${BUILD_NUMBER}_test_$(date +%s).json
+				'''
+			}
+		}
+
+		stage ('TF Docs') {
+			steps {
+				echo '---- Generating Markdown TFDocs'
+				sh '''
+					terraform-docs \
+					-c .ci/.tfdocs_md.yml .
+					aws s3 cp tfdocs.md s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/tfdocs/${BUILD_NUMBER}_tfdocs_$(date +%s).md
+				'''
+				echo '---- Generating Json TFDocs'
+				sh '''
+					terraform-docs \
+					-c .ci/.tfdocs_json.yml .
+					aws s3 cp tfdocs.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/tfdocs/${BUILD_NUMBER}_tfdocs_$(date +%s).json
 				'''
 			}
 		}
