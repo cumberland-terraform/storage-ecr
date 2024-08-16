@@ -52,6 +52,10 @@ module "ecr" {
                         purpose                 = "<purpose>"
                 }
 	}
+        
+	kms						= {
+		alias_suffix		= "<resource-suffix> 
+	}
 }
 ```
 
