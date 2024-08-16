@@ -24,7 +24,7 @@ locals {
                                         module.platform.prefixes.storage.ecr.repository,
                                         var.ecr.suffix
                                     ]))
-    ## RDS DEFAULTS
+    ## ECR DEFAULTS
     #   These are platform defaults and should only be changed when the 
     #       platform itself changes.
     platform_defaults               = {
@@ -32,7 +32,7 @@ locals {
     }
     
     ## CALCULATED PROPERTIES
-    # Variables that store local calculations
+    #   Variables that change based on deployment configuration. 
     tags                            = merge({
         Name                        = local.name
         Builder                     = var.ecr.tags.builder
