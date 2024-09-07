@@ -28,6 +28,7 @@ variable "ecr" {
     kms_key                     = optional(object({
       id                        = string
       arn                       = string
-    }))
+      alias_arn                 = string
+    }), null)
   })
 }

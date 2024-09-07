@@ -115,7 +115,7 @@ Ensure each item on the following checklist is complete before updating any tena
 - [] Open PR into `test` branch
 - [] Ensure tests are passing in Jenkins
 - [] Increment `git tag` version
-- [] Merge PR into `test`
+
 - [] Open PR from `test` into `master` branch
 - [] Get approval from lead
 - [] Merge into `master`
