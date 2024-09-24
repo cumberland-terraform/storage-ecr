@@ -26,6 +26,7 @@ locals {
     #       platform itself changes.
     platform_defaults               = {
         scan_on_push                = true
+        image_tag_mutability        = "IMMUTABLE"
     }
     
     ## CALCULATED PROPERTIES

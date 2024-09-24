@@ -15,18 +15,20 @@ variable "platform" {
 variable "ecr" {
   description                   = "ECR configuration object. See [README]() for detailed infromation about the permitted values for each field."
   type                          = object({
-    suffix                      = string
-    tags                          = object({
-      builder                     = string
-      primary_contact             = string
-      owner                       = string
-      purpose                     = string
+    tags                        = object({
+      builder                   = string
+      primary_contact           = string
+      owner                     = string
+      purpose                   = string
     })
     additional_policies         = optional(list(string), [])
+    policy_principals           = optional(list(string), null)
     mutability                  = optional(string, "IMMUTABLE")
     kms_key                     = optional(object({
       id                        = string
       arn                       = string
     }))
+    suffix                      = optional(string, "REPO")
+
   })
 }
