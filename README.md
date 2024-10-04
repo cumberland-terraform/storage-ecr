@@ -25,7 +25,7 @@ provider "aws" {
 
 ```hcl
 module "ecr" {
-	source          		        = "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-storage-ecr.git?ref=v1.0.0"
+	source          		        = "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-storage-ecr.git"
 	
         providers                               = {
                 aws                             = aws.tenant
@@ -71,6 +71,7 @@ The `ecr` object represents the configuration for a new deployment. Only one fie
 	- `arn`: AWS ARN of the KMS key.
         - `alias_arn`: AWS ARN of the KMS key alias.
 - `suffix`: (*Optional*) Suffix that will be appended to the end of the platform prefix. Defaults to `REPO`.
+
 ## Contributing
 
 The below instructions are to be performed within Unix-style terminal. 
