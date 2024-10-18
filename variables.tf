@@ -23,10 +23,12 @@ variable "ecr" {
     })
     additional_policies         = optional(list(string), [])
     policy_principals           = optional(list(string), null)
+
     kms_key                     = optional(object({
-      id                        = string
-      arn                       = string
-      alias_arn                 = string
+      aws_managed               = optional(bool, false)
+      id                        = optional(string, null)
+      arn                       = optional(string, null)
+      alias_arn                 = optional(string, null)
     }), null)
   })
 }

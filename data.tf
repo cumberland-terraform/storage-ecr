@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 data "aws_iam_policy_document" "merged" {
     count                           = local.conditions.merge_policies ? 1 : 0
 
@@ -27,8 +25,14 @@ data "aws_iam_policy_document" "unmerged" {
                                     ]
         
         principals {
-            type                  = "AWS"
-            identifiers           = local.unmerged_policy_principals
+            type                    = "AWS"
+            identifiers             = local.unmerged_policy_principals
         }
     }
+}
+
+data "aws_kms_key" "this" {
+    count                           = var.ecr.kms_key.aws_managed ? 1 : 0
+
+    key_id                          = local.platform_defaults.aws_managed_key_alias
 }
