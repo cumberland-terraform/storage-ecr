@@ -24,7 +24,7 @@ locals {
                                     ) : data.aws_iam_policy_document.unmerged.json
                                     
     unmerged_policy_principals      = local.conditions.root_principal ? [
-                                        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+                                        "arn:aws:iam::${module.platform.aws.account_id}:root"
                                     ] : var.ecr.policy_principals
 
     kms_key                         = local.conditions.provision_key ? (
@@ -37,7 +37,7 @@ locals {
                                         aws_managed = true
                                         alias_arn   = join("/", [
                                             module.platform.aws.arn.kms.key,
-                                            local.rds_defaults.aws_managed_key_alias
+                                            local.platform_defaults.aws_managed_key_alias
                                         ])
                                     }, {
                                         id          = data.aws_kms_key.this[0].id
