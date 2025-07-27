@@ -45,7 +45,7 @@ locals {
                                     })
 
     name                            = lower(join("-",[
-                                        module.platform.prefixes.storage.ecr.repository,
+                                        module.platform.prefix,
                                         var.ecr.suffix
                                     ]))
 
