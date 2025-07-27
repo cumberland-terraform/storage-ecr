@@ -1,8 +1,8 @@
 # Enterprise Terraform 
-## AWS Core Storage Elastic Container Registry
-### Overview
+## Cumberland Cloud Platform
+## AWS Core - ECR
 
-This the **MDThink Platform** core module for Elastic Container Registry. This module will provision an ECR along with a resource-based policy allowing access to any provided prinicipals. If no additional principals are provided, the resource policy defaults to allow all IAM principals in the target accoutn access to the contents of the ECR.
+This the storage module for Elastic Container Registry. This module will provision an ECR along with a resource-based policy allowing access to any provided prinicipals. If no additional principals are provided, the resource policy defaults to allow all IAM principals in the target accoutn access to the contents of the ECR.
 
 ### Usage
 
@@ -25,7 +25,7 @@ provider "aws" {
 
 ```hcl
 module "ecr" {
-	source          		        = "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-storage-ecr.git"
+	source          		        = "github.com/cumberland-terraform/storage-ecr.git"
 	
         providers                               = {
                 aws                             = aws.tenant
@@ -59,11 +59,7 @@ module "ecr" {
 
 The `ecr` object represents the configuration for a new deployment. Only one fields is absolutely required: `tags`. See previous section for example usage. The following bulleted list shows the hierarchy of allowed values for the `ecr` object fields and their purpose,
 
-- `tags`: (*Required*)
-    - `builder`: (*Required*) Person or process responsible for provisioning.
-	- `primary_contact`: (*Required*) Contact information for the owner of the instance.
-	- `owner`: (*Required*) Name of the owner.
-	- `purpose`: (*Required*) Description of the server. 
+- `tags`: (*Optional*) Map of tags to append to ECR. 
 - `additional_policies`: (*Optional*) A list of stringified policy JSONs. These policies will be attached to the ECR in addition to the default access policy.
 - `policy_principals`: (*Optional*) A list of IAM principal ARNs. This list of IAM principals will be granted use of the KMS key. If no principals are provided, access is provided to all IAM principals in the target account.
 - `kms_key`: (*Optional*) KMS key object used to encrypt block devices. If no KMS key is provided, a new KMS key will be provisioned and access will be provided to the instance profile IAM role.

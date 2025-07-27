@@ -13,7 +13,7 @@ locals {
     #       to different deployment configurations.
     conditions                      = {
         merge_policies              = var.ecr.additional_policies != null
-        provision_key               = var.ecr.kms_key == null
+        provision_key               = var.kms == null
         root_principal              = var.ecr.policy_principals == null
     }
     
@@ -29,8 +29,8 @@ locals {
 
     kms_key                         = local.conditions.provision_key ? (
                                         module.kms[0].key
-                                    ) : !var.ecr.kms_key.aws_managed ? (
-                                        var.ecr.kms_key
+                                    ) : !var.kms.aws_managed ? (
+                                        var.kms
                                     ) :  merge({
                                         # NOTE: the different objects on either side of the ? ternary operator
                                         #       have to match type, so hacking the types together.
@@ -49,13 +49,7 @@ locals {
                                         var.ecr.suffix
                                     ]))
 
-    tags                            = merge({
-        Name                        = local.name
-        Builder                     = var.ecr.tags.builder
-        Owner                       = var.ecr.tags.owner
-        Purpose                     = var.ecr.tags.purpose
-        PrimaryContact              = var.ecr.tags.primary_contact
-    }, module.platform.tags)
+    tags                            = merge(var.ecr.tags, module.platform.tags)
 
 
 }
