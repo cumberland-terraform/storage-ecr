@@ -11,7 +11,7 @@ variable "ecr" {
   description                   = "ECR configuration object. See [README](https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-core-storage-ecr/browse) for detailed information about the permitted values for each field."
   type                          = object({
     suffix                      = string
-    tags                        = map(string)
+    tags                        = optional(map(string), {})
     additional_policies         = optional(list(string), [])
     policy_principals           = optional(list(string), null)
   })
