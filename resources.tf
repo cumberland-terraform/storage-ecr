@@ -13,6 +13,10 @@ resource "aws_ecr_repository" "this" {
 }
 
 resource "aws_ecr_repository_policy" "this" {
-  repository                = aws_ecr_repository.this.name
-  policy                    = local.policy
+    lifecycle {
+        ignore_changes      = [ policy  ]
+    }
+
+    repository              = aws_ecr_repository.this.name
+    policy                  = local.policy
 }
